@@ -1,0 +1,11 @@
+def count_words(text):
+    #the defined function takes the string "text" as input
+    words = text.split()
+    #spli()method is used to split the text into individual words
+    # Return the number of words
+    #split function actually gives list of word in that text and then length of the list will be the number of words in the text
+    return len(words)
+if __name__ == "__main__":
+    sample_text = input("Enter your text: ")
+    word_count = count_words(sample_text)
+    print(f"The number of words in the text is: {word_count}")
