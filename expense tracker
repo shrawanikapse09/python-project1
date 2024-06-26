@@ -1,0 +1,89 @@
+ import csv
+from datetime import datetime
+import os
+
+# Constants
+DATA_FILE = 'expenses.csv'
+CATEGORIES = ['food', 'transportation', 'entertainment', 'utilities', 'other']
+
+# Function to initialize the CSV file
+def initialize_data_file():
+    if not os.path.exists(DATA_FILE):
+        with open(DATA_FILE, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['date', 'amount', 'category', 'description'])
+
+# Function to add an expense
+def add_expense(amount, category, description):
+    with open(DATA_FILE, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([datetime.now().strftime('%Y-%m-%d'), amount, category, description])
+
+# Function to read all expenses
+def read_expenses():
+    expenses = []
+    with open(DATA_FILE, mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            expenses.append(row)
+    return expenses
+
+# Function to summarize expenses by month and category
+def summarize_expenses():
+    expenses = read_expenses()
+    summary = {}
+    
+    for expense in expenses:
+        month = expense['date'][:7]  # 'YYYY-MM' format
+        amount = float(expense['amount'])
+        category = expense['category']
+        
+        if month not in summary:
+            summary[month] = {}
+        
+        if category not in summary[month]:
+            summary[month][category] = 0
+        
+        summary[month][category] += amount
+    
+    return summary
+
+# User Interface
+def main():
+    initialize_data_file()
+    
+    while True:
+        print("\nExpense Tracker")
+        print("1. Add Expense")
+        print("2. View Summary")
+        print("3. Exit")
+        choice = input("Choose an option: ")
+        
+        if choice == '1':
+            try:
+                amount = float(input("Enter amount: "))
+                category = input(f"Enter category ({', '.join(CATEGORIES)}): ").strip().lower()
+                if category not in CATEGORIES:
+                    raise ValueError("Invalid category")
+                description = input("Enter description: ")
+                add_expense(amount, category, description)
+                print("Expense added successfully!")
+            except ValueError as e:
+                print(f"Error: {e}")
+        
+        elif choice == '2':
+            summary = summarize_expenses()
+            for month, categories in summary.items():
+                print(f"\n{month}:")
+                for category, total in categories.items():
+                    print(f"  {category}: ${total:.2f}")
+        
+        elif choice == '3':
+            print("Exiting Expense Tracker")
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
